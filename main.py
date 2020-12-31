@@ -17,7 +17,6 @@ GPU = torch.cuda.is_available()
 device = torch.device("cuda" if GPU else "cpu")
 print('GPU: %s     ||    Training on %s\n'%(GPU,device))
 
-
 ########################## CREATE DATALOADERS ###########################
 
 #Create datasets
@@ -26,7 +25,6 @@ train_Dataset, valid_Dataset, test_Dataset = data.create_datasets(seed, n_halos,
 train_loader = DataLoader(dataset=train_Dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(dataset=valid_Dataset, batch_size=batch_size, shuffle=True)
 test_loader  = DataLoader(dataset=test_Dataset,  batch_size=batch_size, shuffle=True)
-
 
 ################################# Objective Function #############################
 
@@ -43,7 +41,8 @@ def objective(trial):
     wd = trial.suggest_float("wd", 1e-5, 1e3, log=True)
     optimizer = getattr(optim, "Adam")(model.parameters(), lr=lr, weight_decay = wd)
     
-    # Train the model.
+    # Train the model
+    min_valid = 1e40
     for epoch in range(num_epochs):
         model.train()
         count, loss_train = 0, 0.0
@@ -69,16 +68,20 @@ def objective(trial):
             loss_valid += loss.cpu().detach().numpy()
             count += 1
         loss_valid /= count
-        Loss_valid[epoch] = loss_valid
 
-        trial.report(loss_valid, epoch)
+        if loss_valid<min_valid:  
+                min_valid = valid_loss
+                torch.save(model.state_dict(), f_best_model)
+            f = open(f_text_file, 'a')
+            f.write('%d %.5e %.5e\n'%(epoch, valid_loss, min_valid))
+            f.close()
 
         # Handle pruning based on the intermediate value.
-        if trial.should_prune():
-            raise optuna.exceptions.TrialPruned()
+        # trial.report(loss_valid, epoch)
+        # if trial.should_prune():
+        #    raise optuna.exceptions.TrialPruned()
 
     return loss_valid
-
 
 ##################################### INPUT #######################################
 # Data Parameters
@@ -100,6 +103,9 @@ n_max = 11              # Maximum number of neurons in hidden layers
 # Optuna Parameters
 n_trials   = 1000 
 
+#Name text file for saving results
+f_text_file   = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.txt'%(n_hidden, learning_rate, weight_decay)
+f_best_model  = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.pt'%(n_hidden, learning_rate, weight_decay)
 ############################## Start OPTUNA Study ###############################
 if __name__ == "__main__":
     study = optuna.create_study(direction="maximize")
