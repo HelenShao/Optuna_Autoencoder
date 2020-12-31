@@ -16,7 +16,8 @@ import architecture, data
 def objective(trial):
      
     # Generate the model.
-    model = architecture.Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max).to(device)
+    model = architecture.Autoencoder(trial, input_size, bottleneck_neurons, 
+                                     n_min, n_max, max_layers).to(device)
 
     # Generate the optimizers, learning_rate, and weight_decay.
     criterion = nn.MSELoss()
@@ -87,7 +88,7 @@ max_layers = 5          # Maximum number of hidden layers
 # Optuna Parameters
 n_trials   = 1000 
 
-#Name text file for saving results
+#Files for saving results and best model
 f_text_file   = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.txt'%(n_hidden, learning_rate, weight_decay)
 f_best_model  = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.pt'%(n_hidden, learning_rate, weight_decay)
 
