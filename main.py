@@ -11,26 +11,15 @@ from torch.utils.data import Dataset, DataLoader, random_split, SubsetRandomSamp
 import optuna
 import architecture, data 
 
-########################## CREATE DATALOADERS ###########################
-
-#Create datasets
-train_Dataset, valid_Dataset, test_Dataset = data.create_datasets(seed, n_halos, halo_data, batch_size)
-
-train_loader = DataLoader(dataset=train_Dataset, batch_size=batch_size, shuffle=True)
-valid_loader = DataLoader(dataset=valid_Dataset, batch_size=batch_size, shuffle=True)
-test_loader  = DataLoader(dataset=test_Dataset,  batch_size=batch_size, shuffle=True)
-
 ################################# Objective Function #############################
 
-# Create loss and optimizer function for training  
-criterion = nn.MSELoss()  
-
 def objective(trial):
-
+     
     # Generate the model.
     model = architecture.Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max).to(device)
 
     # Generate the optimizers, learning_rate, and weight_decay.
+    criterion = nn.MSELoss()
     lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
     wd = trial.suggest_float("wd", 1e-5, 1e3, log=True)
     optimizer = getattr(optim, "Adam")(model.parameters(), lr=lr, weight_decay = wd)
@@ -79,6 +68,7 @@ def objective(trial):
 
 ##################################### INPUT #######################################
 # Data Parameters
+n_halos      = 3674
 n_properties = 11
 seed         = 4
 mass_per_particle = 6.56561e+11
@@ -100,6 +90,15 @@ n_trials   = 1000
 #Name text file for saving results
 f_text_file   = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.txt'%(n_hidden, learning_rate, weight_decay)
 f_best_model  = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.pt'%(n_hidden, learning_rate, weight_decay)
+
+########################## CREATE DATALOADERS ###########################
+#Create datasets
+train_Dataset, valid_Dataset, test_Dataset = data.create_datasets(seed, n_halos, halo_data, batch_size)
+
+#Create Dataloaders
+train_loader = DataLoader(dataset=train_Dataset, batch_size=batch_size, shuffle=True)
+valid_loader = DataLoader(dataset=valid_Dataset, batch_size=batch_size, shuffle=True)
+test_loader  = DataLoader(dataset=test_Dataset,  batch_size=batch_size, shuffle=True)
 
 ############################## Start OPTUNA Study ###############################
 # Use GPUs if avaiable
