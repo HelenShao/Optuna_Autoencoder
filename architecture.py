@@ -1,0 +1,71 @@
+import torch 
+import torch.nn as nn
+import numpy as np
+import sys, os, time
+import optuna
+
+############################### ARCHITECTURE ############################## 
+
+# define the lists containing the encoder and decoder layers
+encoder_layers = []
+decoder_layers = []
+
+# define a container for out_features
+out_features   = []
+
+# Controlled parameters
+input_size = 11         # Number of input features 
+bottleneck_neurons = 6  # Number of neurons in bottleneck
+n_min = 6               # Minimum number of neurons in hidden layers
+n_max = 11              # Maximum number of neurons in hidden layers
+max_layers = 5          # Maximum number of hidden layers
+
+def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max):
+    n_layers = trial.suggest_int("n_layers", 1, max_layers)
+    for i in range(n_layers):
+        if i == 0: 
+            # Define out_features
+            out_features.append(trial.suggest_int("n_units_{}".format(i), n_min, n_max))
+        
+            # Add encoder input layer 
+            encoder_layers.append(nn.Linear(input_size, out_features[0]))
+            encoder_layers.append(nn.LeakyReLU(0.2))
+        
+            # Define in_features to be out_features for decoder
+            in_features = out_features[0]
+        
+            # Add final decoder output layer
+            decoder_layers.append(nn.Linear(in_features, input_size))
+            # No activation layer here (decoder output)
+    
+        elif i == n_layers - 1:
+            # add the layers adjacent to the bottleneck
+            encoder_layers.append(nn.Linear(in_features, bottleneck_neurons))
+            encoder_layers.append(nn.LeakyReLU(0.2))
+        
+            decoder_layers.append(nn.Linear(bottleneck_neurons, in_features))
+            decoder_layers.append(nn.LeakyReLU(0.2))
+        
+        else:
+            # Define out_features
+            out_features.append(trial.suggest_int("n_units_{}".format(i), n_min, n_max))
+        
+            # Add encoder layers
+            encoder_layers.append(nn.Linear(in_features, out_features[i]))
+            encoder_layers.append(nn.LeakyReLU(0.2))
+        
+            # Define in_features to be out_features for decoder
+            in_features = out_features[i] 
+
+            # Add decoder layers
+            decoder_layers.append(nn.Linear(in_features, out_features[i-1]))
+            decoder_layers.append(nn.LeakyReLU(0.2))
+
+    # Reverse order of layers in decoder list
+    decoder_layers.reverse()
+
+    # Complete layers list
+    layers = encoder_layers + decoder_layers
+
+    # return the model
+    return nn.Sequential(*layers)
