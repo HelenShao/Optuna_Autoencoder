@@ -10,7 +10,7 @@ import optuna
 input_size = 11         # Number of input features 
 bottleneck_neurons = 6  # Number of neurons in bottleneck
 n_min = 6               # Minimum number of neurons in hidden layers
-n_max = 11              # Maximum number of neurons in hidden layers
+n_max = 64              # Maximum number of neurons in hidden layers
 max_layers = 5          # Maximum number of hidden layers
 
 def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max):
