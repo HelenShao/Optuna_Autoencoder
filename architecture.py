@@ -6,13 +6,6 @@ import optuna
 
 ############################### ARCHITECTURE ############################## 
 
-# define the lists containing the encoder and decoder layers
-encoder_layers = []
-decoder_layers = []
-
-# define a container for out_features
-out_features   = []
-
 # Controlled parameters
 input_size = 11         # Number of input features 
 bottleneck_neurons = 6  # Number of neurons in bottleneck
@@ -21,6 +14,13 @@ n_max = 11              # Maximum number of neurons in hidden layers
 max_layers = 5          # Maximum number of hidden layers
 
 def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max):
+    # define the lists containing the encoder and decoder layers
+    encoder_layers = []
+    decoder_layers = []
+
+    # define a container for out_features
+    out_features   = []
+    
     n_layers = trial.suggest_int("n_layers", 1, max_layers)
     for i in range(n_layers):
         if i == 0: 
@@ -64,7 +64,7 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max):
     # Reverse order of layers in decoder list
     decoder_layers.reverse()
 
-    # Complete layers list
+    # Complete layers list (symmetric)
     layers = encoder_layers + decoder_layers
 
     # return the model
