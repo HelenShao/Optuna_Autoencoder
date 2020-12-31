@@ -13,7 +13,7 @@ n_min = 6               # Minimum number of neurons in hidden layers
 n_max = 200             # Maximum number of neurons in hidden layers
 max_layers = 5          # Maximum number of hidden layers
 
-def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max):
+def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max, max_layers):
     # define the lists containing the encoder and decoder layers
     encoder_layers = []
     decoder_layers = []
