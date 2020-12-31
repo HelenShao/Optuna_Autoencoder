@@ -11,7 +11,7 @@ seed         = 4
 mass_per_particle = 6.56561e+11
 filename = "./Halo_Data/Rockstar_z=0.0.txt"
 
-#################################### LOAD HALO DATA ###################################
+#################################### Select Halos from Data ###################################
 
 # Halo Mask Array
 PIDs = np.loadtxt(filename, usecols=41)      # Array of IDs (Halos have ID = -1)
@@ -58,7 +58,7 @@ T_U      = np.loadtxt(filename, skiprows = 16, usecols = 37)[is_halo][np_mask]
 properties = [m_vir, v_max, v_rms, r_vir, r_s, v_mag, J_mag, spin, b_to_a, c_to_a, T_U]
 
 
-########################### NORMALIZE DATA #########################
+###################################### NORMALIZE DATA ###################################
 def normalize_data(property):
     "This function normalizes the input data"
     mean = np.mean(property)
