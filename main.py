@@ -9,6 +9,7 @@ import torch.nn.functional as F
 from torchvision import transforms, utils, datasets
 from torch.utils.data import Dataset, DataLoader, random_split, SubsetRandomSampler, WeightedRandomSampler
 import optuna
+import architecture, data 
 
 ############################ USE GPUS ###############################
 
