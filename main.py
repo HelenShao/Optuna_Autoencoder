@@ -73,6 +73,7 @@ n_halos      = 3674
 n_properties = 11
 seed         = 4
 mass_per_particle = 6.56561e+11
+f_rockstar = "./Halo_Data/Rockstar_z=0.0.txt"
 
 # Training Parameters
 num_epochs    = 300
