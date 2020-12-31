@@ -11,12 +11,6 @@ from torch.utils.data import Dataset, DataLoader, random_split, SubsetRandomSamp
 import optuna
 import architecture, data 
 
-############################ USE GPUS ###############################
-
-GPU = torch.cuda.is_available()
-device = torch.device("cuda" if GPU else "cpu")
-print('GPU: %s     ||    Training on %s\n'%(GPU,device))
-
 ########################## CREATE DATALOADERS ###########################
 
 #Create datasets
@@ -81,11 +75,10 @@ def objective(trial):
         # if trial.should_prune():
         #    raise optuna.exceptions.TrialPruned()
 
-    return loss_valid
+    return min_valid
 
 ##################################### INPUT #######################################
 # Data Parameters
-n_halos      = 3674
 n_properties = 11
 seed         = 4
 mass_per_particle = 6.56561e+11
@@ -98,7 +91,8 @@ batch_size    = 64
 input_size = 11         # Number of input features 
 bottleneck_neurons = 6  # Number of neurons in bottleneck
 n_min = 6               # Minimum number of neurons in hidden layers
-n_max = 11              # Maximum number of neurons in hidden layers
+n_max = 200             # Maximum number of neurons in hidden layers
+max_layers = 5          # Maximum number of hidden layers
 
 # Optuna Parameters
 n_trials   = 1000 
@@ -106,10 +100,22 @@ n_trials   = 1000
 #Name text file for saving results
 f_text_file   = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.txt'%(n_hidden, learning_rate, weight_decay)
 f_best_model  = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.pt'%(n_hidden, learning_rate, weight_decay)
+
 ############################## Start OPTUNA Study ###############################
+# Use GPUs if avaiable
+if torch.cuda.is_available():
+    print("CUDA Available")
+    device = torch.device('cuda')
+else:
+    print('CUDA Not Available')
+    device = torch.device('cpu')
+
 if __name__ == "__main__":
+    # define the optuna study and optimize it
+    objective = objective(trial)
+    
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=n_trials, timeout=600)
+    study.optimize(objective, n_trials=n_trials)
 
     pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
     complete_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
@@ -119,11 +125,10 @@ if __name__ == "__main__":
     print("  Number of pruned trials: ", len(pruned_trials))
     print("  Number of complete trials: ", len(complete_trials))
 
-    print("Best trial:")
+    # Print parameters of the best trial
     trial = study.best_trial
-
-    print("  Value: ", trial.value)
-
+    print("Best trial: number {}".format(trial.number))
+    print("  Value: {}".format(trial.value))
     print("  Params: ")
     for key, value in trial.params.items():
         print("    {}: {}".format(key, value))
