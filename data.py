@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import sys, os, time
 
-################ DATA PARAMETERS #################
+#################### INPUT #####################
 seed         = 4
 f_rockstar = "./Halo_Data/Rockstar_z=0.0.txt"
 
