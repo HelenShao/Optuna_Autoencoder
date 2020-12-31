@@ -124,12 +124,8 @@ class make_Dataset(Dataset):
         
         # do a loop over all elements in the dataset
         for i in range(size):
-            
-            # find the halo index (shuffled)
-            j = indexes[i+offset]
-
-            # load data
-            self.input [i] = halo_data[j]
+            j = indexes[i+offset]          # find the halo index (shuffled)
+            self.input [i] = halo_data[j]  # load data
             
     def __len__(self):
         return self.size
