@@ -5,88 +5,93 @@ import numpy as np
 import sys, os, time
 
 ################ DATA PARAMETERS #################
-n_halos      = 3674
 n_properties = 11
 seed         = 4
 mass_per_particle = 6.56561e+11
 filename = "./Halo_Data/Rockstar_z=0.0.txt"
 
 #################################### Select Halos from Data ###################################
+filename = "./Halo_Data/Rockstar_z=0.0.txt"
 
 # Halo Mask Array
-PIDs = np.loadtxt(filename, usecols=41)      # Array of IDs (Halos have ID = -1)
-is_halo  = np.array([x == -1 for x in PIDs]) # Boolean array to identify halos from subhalos
+PIDs = np.loadtxt(filename, usecols=41) # Array of IDs (Halos have ID = -1)
+is_halo  = np.array([x == -1 for x in PIDs])        # Conditional array to identify halos from subhalos
 
 # Number of Particles Per Halo >500 
 m_vir    = np.loadtxt(filename, skiprows = 16, usecols = 2)[is_halo]
 n_particles = m_vir / mass_per_particle
 np_mask     = np.array([x>500 for x in n_particles])
 
+# Find the number of halos
+n_halos = np.size(m_vir[np_mask])
 
 #################################  Read halo properties ###############################
-m_vir    = np.loadtxt(filename, skiprows = 16, usecols = 2)[is_halo][np_mask]
-v_max    = np.loadtxt(filename, skiprows = 16, usecols = 3)[is_halo][np_mask]
-v_rms    = np.loadtxt(filename, skiprows = 16, usecols = 4)[is_halo][np_mask]
-r_vir    = np.loadtxt(filename, skiprows = 16, usecols = 5)[is_halo][np_mask]
-r_s      = np.loadtxt(filename, skiprows = 16, usecols = 6)[is_halo][np_mask]
+# Define container for data
+data = np.zeros((n_halos, n_properties), dtype=np.float32)
+ 
+#m_vir
+data[:,0] = np.loadtxt(filename, skiprows = 16, usecols = 2)[is_halo][np_mask]
+
+#v_max
+data[:,1] = np.loadtxt(filename, skiprows = 16, usecols = 3)[is_halo][np_mask]
+
+# v_rms
+data[:,2] = np.loadtxt(filename, skiprows = 16, usecols = 4)[is_halo][np_mask]
+
+# r_vir
+data[:,3] = np.loadtxt(filename, skiprows = 16, usecols = 5)[is_halo][np_mask]
+
+# r_s
+data[:,4] = np.loadtxt(filename, skiprows = 16, usecols = 6)[is_halo][np_mask]
 
 # Velocities 
 v_x      = np.loadtxt(filename, skiprows = 16, usecols = 11)[is_halo][np_mask]
 v_y      = np.loadtxt(filename, skiprows = 16, usecols = 12)[is_halo][np_mask]
 v_z      = np.loadtxt(filename, skiprows = 16, usecols = 13)[is_halo][np_mask]
 v_mag    = np.sqrt((v_x**2) + (v_y**2) + (v_z**2))
+data[:,5] = v_mag
 
 # Angular momenta 
 J_x      = np.loadtxt(filename, skiprows = 16, usecols = 14)[is_halo][np_mask]
 J_y      = np.loadtxt(filename, skiprows = 16, usecols = 15)[is_halo][np_mask]
 J_z      = np.loadtxt(filename, skiprows = 16, usecols = 16)[is_halo][np_mask]
 J_mag    = np.sqrt((J_x**2) + (J_y**2) + (J_z**2))
+data[:,6] = J_mag
 
 # Spin
-spin     = np.loadtxt(filename, skiprows = 16, usecols = 17)[is_halo][np_mask]
+data[:,7] = np.loadtxt(filename, skiprows = 16, usecols = 17)[is_halo][np_mask]
 
 # b_to_a
-b_to_a   = np.loadtxt(filename, skiprows = 16, usecols = 27)[is_halo][np_mask]
+data[:,8] = np.loadtxt(filename, skiprows = 16, usecols = 27)[is_halo][np_mask]
 
 # c_to_a
-c_to_a   = np.loadtxt(filename, skiprows = 16, usecols = 28)[is_halo][np_mask]
+data[:,9] = np.loadtxt(filename, skiprows = 16, usecols = 28)[is_halo][np_mask]
 
 # Ratio of kinetic to potential energies T/|U|
-T_U      = np.loadtxt(filename, skiprows = 16, usecols = 37)[is_halo][np_mask]
-
-# Create list for all properties
-properties = [m_vir, v_max, v_rms, r_vir, r_s, v_mag, J_mag, spin, b_to_a, c_to_a, T_U]
-
+data[:,10] = np.loadtxt(filename, skiprows = 16, usecols = 37)[is_halo][np_mask]
 
 ###################################### NORMALIZE DATA ###################################
-def normalize_data(property):
-    "This function normalizes the input data"
-    mean = np.mean(property)
-    std  = np.std(property)
-    normalized = (property - mean)/std
-    
-    return normalized
+# This function normalizes the input data
+def normalize_data(data):
+    data_norm = np.zeros((n_halos, n_properties), dtype=np.float32)
+    for i in range(n_properties):
+        mean = np.mean(data[:,i])
+        std  = np.std(data[:,i])
+        normalized = (data[:,i] - mean)/std
+        data_norm[:,i] = normalized
+    return(data_norm)
 
 # Take log10 of m_vir and J_mag
-m_vir_log  = np.log10(m_vir+1)
-J_mag_log  = np.log10(J_mag+1)
+data[:,0]  = np.log10(data[:,0]+1)
+data[:,6]  = np.log10(data[:,6]+1)
 
-# New properties array
-properties = np.array([m_vir_log, v_max, v_rms, r_vir, r_s, v_mag, J_mag_log, spin, b_to_a, c_to_a, T_U])
-
-# Normalize the properties
-norm_properties = np.zeros((len(properties), len(properties[0])), dtype = np.float32)
-for i in range(len(properties)):
-    norm_properties[i]  = normalize_data(properties[i])
-    
-# Reshape data
-halo_data = norm_properties.reshape(n_halos, n_properties)
+# Normalize each property
+halo_data = normalize_data(data)
 
 # Convert to torch tensor
 halo_data = torch.tensor(halo_data, dtype=torch.float)
 
-
-# Make custom torch dataset
+###################################### Create Datasets ###################################
 class make_Dataset(Dataset):
     
     def __init__(self, name, seed, n_halos, halo_data):
@@ -124,7 +129,6 @@ class make_Dataset(Dataset):
     def __getitem__(self, idx):
         return self.input[idx]
     
-########################### CREATE DATASETS ############################
 
 #This function creates datasets for train, valid, test
 def create_datasets(seed, n_halos, halo_data, batch_size):
