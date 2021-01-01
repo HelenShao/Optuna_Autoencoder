@@ -13,11 +13,12 @@ import architecture, data
 
 ################################# Objective Function #############################
 class objective(object):
-    def __init__(self, input_size, bottleneck_neurons, n_min, n_max, 
+    def __init__(self, input_size, bottleneck_neurons, n_min, n_max, min_layers,
                  max_layers, f_rockstar, device, num_epochs, seed, batch_size, n_halos): 
         
         self.input_size         = input_size
         self.max_layers         = max_layers
+        self.min_layers         = min_layers
         self.n_min              = n_min
         self.device             = device
         self.num_epochs         = num_epochs
@@ -114,6 +115,7 @@ input_size = 11         # Number of input features
 bottleneck_neurons = 6  # Number of neurons in bottleneck
 n_min = 6               # Minimum number of neurons in hidden layers
 n_max = 200             # Maximum number of neurons in hidden layers
+min_layers = 1          # Minimum number of hidden layers
 max_layers = 5          # Maximum number of hidden layers
 
 # Optuna Parameters
@@ -133,7 +135,7 @@ else:
 if __name__ == "__main__":
     
     # define the optuna study and optimize it
-    objective = objective(input_size, bottleneck_neurons, n_min, n_max, 
+    objective = objective(input_size, bottleneck_neurons, n_min, n_max, min_layers,
                  max_layers, f_rockstar, device, num_epochs, seed, batch_size, n_halos)
     
     # !! Optimization direction = minimize valid_loss !!
