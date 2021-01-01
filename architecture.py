@@ -4,15 +4,7 @@ import numpy as np
 import sys, os, time
 import optuna
 
-############################### ARCHITECTURE ############################## 
-
-# Controlled parameters
-input_size = 11         # Number of input features 
-bottleneck_neurons = 6  # Number of neurons in bottleneck
-n_min = 6               # Minimum number of neurons in hidden layers
-n_max = 200             # Maximum number of neurons in hidden layers
-max_layers = 5          # Maximum number of hidden layers
-
+# Define the Autoencoder architecture 
 def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max, max_layers):
     # define the lists containing the encoder and decoder layers
     encoder_layers = []
