@@ -97,7 +97,7 @@ def read_data(f_rockstar):
 ###################################### Create Datasets ###################################
 class make_Dataset(Dataset):
     
-    def __init__(self, name, seed, n_halos, halo_data):
+    def __init__(self, name, seed, n_halos, halo_data, f_rockstar):
          
         # shuffle the halo number (instead of 0 1 2 3...999 have a 
         # random permutation. E.g. 5 9 0 29...342)
