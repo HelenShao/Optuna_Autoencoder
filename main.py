@@ -35,8 +35,8 @@ class objective(object):
         f_best_model  = 'HALOS_AE_%d.pt'%(trial.number)
 
         # Generate the model.
-        model = architecture.Autoencoder(trial, input_size, bottleneck_neurons, 
-                                         n_min, n_max, max_layers).to(device)
+        model = architecture.Autoencoder(trial, input_size, bottleneck_neurons, n_min,
+                                         n_max, min_layers, max_layers).to(device)
 
         # Define loss function
         criterion = nn.MSELoss()
