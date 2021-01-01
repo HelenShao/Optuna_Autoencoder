@@ -13,7 +13,8 @@ import architecture, data
 
 ################################# Objective Function #############################
 
-def objective(trial):
+def objective(trial, input_size, bottleneck_neurons, n_min, n_max, max_layers,
+             f_rockstar, f_best_model, f_text_file):
      
     # Generate the model.
     model = architecture.Autoencoder(trial, input_size, bottleneck_neurons, 
@@ -90,8 +91,8 @@ max_layers = 5          # Maximum number of hidden layers
 n_trials   = 1000 
 
 #Files for saving results and best model
-f_text_file   = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.txt'%(n_hidden, learning_rate, weight_decay)
-f_best_model  = 'HALOS_AE_%d_lr=%.1e_wd=%.1e.pt'%(n_hidden, learning_rate, weight_decay)
+f_text_file   = 'HALOS_AE_%d.txt'%(trial.number)
+f_best_model  = 'HALOS_AE_%d.pt'%(trial.number)
 
 ########################## CREATE DATALOADERS ###########################
 #Create datasets
@@ -113,7 +114,8 @@ else:
 
 if __name__ == "__main__":
     # define the optuna study and optimize it
-    objective = objective(trial)
+    objective = objective(trial, input_size, bottleneck_neurons, n_min, n_max, max_layers,
+             f_rockstar, f_best_model, f_text_file)
     
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=n_trials)
