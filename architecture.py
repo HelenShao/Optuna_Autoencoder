@@ -16,14 +16,14 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min,
     
     n_layers = trial.suggest_int("n_layers", min_layers, max_layers)
     for i in range(n_layers):
-        if i == 0: 
+        if i == 0: # First and last layers of the model
             if i == n_layers - 1:  # if only 1 hidden layer
                 # Add encoder input layer 
-                encoder_layers.append(nn.Linear(input_size, bottleneck_features))
+                encoder_layers.append(nn.Linear(input_size, bottleneck_neurons))
                 encoder_layers.append(nn.LeakyReLU(0.2))
 
                 # Add final decoder output layer
-                decoder_layers.append(nn.Linear(bottleneck_features, input_size))
+                decoder_layers.append(nn.Linear(bottleneck_neurons, input_size))
                 # No activation layer here (decoder output)
                 
             else: 
@@ -40,8 +40,8 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min,
                 # Add final decoder output layer
                 decoder_layers.append(nn.Linear(in_features, input_size))
                 # No activation layer here (decoder output)
-    
-        elif i == n_layers - 1:
+     
+        elif i == n_layers - 1: 
             # add the layers adjacent to the bottleneck
             encoder_layers.append(nn.Linear(in_features, bottleneck_neurons))
             encoder_layers.append(nn.LeakyReLU(0.2))
