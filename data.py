@@ -94,7 +94,7 @@ def read_data(f_rockstar):
     # Convert to torch tensor
     halo_data = torch.tensor(halo_data, dtype=torch.float)
     
-    return(halo_data)
+    return halo_data
 
 ###################################### Create Datasets ###################################
 class make_Dataset(Dataset):
