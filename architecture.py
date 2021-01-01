@@ -27,19 +27,19 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min,
                 # No activation layer here (decoder output)
                 
             else: 
-            # Define out_features
-            out_features.append(trial.suggest_int("n_units_{}".format(i), n_min, n_max))
-        
-            # Add encoder input layer 
-            encoder_layers.append(nn.Linear(input_size, out_features[0]))
-            encoder_layers.append(nn.LeakyReLU(0.2))
-        
-            # Define in_features to be out_features for decoder
-            in_features = out_features[0]
-        
-            # Add final decoder output layer
-            decoder_layers.append(nn.Linear(in_features, input_size))
-            # No activation layer here (decoder output)
+                # Define out_features
+                out_features.append(trial.suggest_int("n_units_{}".format(i), n_min, n_max))
+
+                # Add encoder input layer 
+                encoder_layers.append(nn.Linear(input_size, out_features[0]))
+                encoder_layers.append(nn.LeakyReLU(0.2))
+
+                # Define in_features to be out_features for decoder
+                in_features = out_features[0]
+
+                # Add final decoder output layer
+                decoder_layers.append(nn.Linear(in_features, input_size))
+                # No activation layer here (decoder output)
     
         elif i == n_layers - 1:
             # add the layers adjacent to the bottleneck
