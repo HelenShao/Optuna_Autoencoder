@@ -27,6 +27,7 @@ class objective(object):
         self.f_rockstar         = f_rockstar
         self.batch_size         = batch_size
         self.n_halos            = n_halos
+        self.bottleneck_neurons = bottleneck_neurons
     
     def __call__(self, trial):
         
