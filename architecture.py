@@ -5,7 +5,8 @@ import sys, os, time
 import optuna
 
 # Define the Autoencoder architecture 
-def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max, max_layers):
+def Autoencoder(trial, input_size, bottleneck_neurons, n_min, 
+                n_max, min_layers, max_layers):
     # define the lists containing the encoder and decoder layers
     encoder_layers = []
     decoder_layers = []
@@ -13,9 +14,19 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min, n_max, max_layers)
     # define a container for out_features
     out_features   = []
     
-    n_layers = trial.suggest_int("n_layers", 1, max_layers)
+    n_layers = trial.suggest_int("n_layers", min_layers, max_layers)
     for i in range(n_layers):
         if i == 0: 
+            if i == n_layers - 1:  # if only 1 hidden layer
+                # Add encoder input layer 
+                encoder_layers.append(nn.Linear(input_size, bottleneck_features))
+                encoder_layers.append(nn.LeakyReLU(0.2))
+
+                # Add final decoder output layer
+                decoder_layers.append(nn.Linear(bottleneck_features, input_size))
+                # No activation layer here (decoder output)
+                
+            else: 
             # Define out_features
             out_features.append(trial.suggest_int("n_units_{}".format(i), n_min, n_max))
         
