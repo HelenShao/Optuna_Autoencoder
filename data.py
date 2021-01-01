@@ -4,9 +4,6 @@ from torch.utils.data import DataLoader
 import numpy as np
 import sys, os, time
 
-#################### INPUT #####################
-seed         = 4
-f_rockstar = "./Halo_Data/Rockstar_z=0.0.txt"
 
 # This function reads the rockstar file
 def read_data(f_rockstar):
@@ -96,6 +93,7 @@ def read_data(f_rockstar):
     
     return halo_data
 
+
 ###################################### Create Datasets ###################################
 class make_Dataset(Dataset):
     
@@ -133,6 +131,7 @@ class make_Dataset(Dataset):
     def __getitem__(self, idx):
         return self.input[idx]
 
+    
 #This function creates datasets for train, valid, test
 def create_datasets(seed, n_halos, halo_data, batch_size):
     
