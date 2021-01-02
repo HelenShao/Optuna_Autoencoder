@@ -14,7 +14,7 @@ import architecture, data
 ################################# Objective Function #############################
 class objective(object):
     def __init__(self, input_size, bottleneck_neurons, n_min, n_max, min_layers,
-                 max_layers, f_rockstar, device, num_epochs, seed, batch_size, n_halos): 
+                 max_layers, f_rockstar, device, num_epochs, seed, batch_size): 
         
         self.input_size         = input_size
         self.max_layers         = max_layers
@@ -26,7 +26,6 @@ class objective(object):
         self.n_max              = n_max
         self.f_rockstar         = f_rockstar
         self.batch_size         = batch_size
-        self.n_halos            = n_halos
         self.bottleneck_neurons = bottleneck_neurons
     
     def __call__(self, trial):
@@ -48,7 +47,7 @@ class objective(object):
         optimizer = getattr(optim, "Adam")(model.parameters(), lr=lr, weight_decay = wd)
     
         #Create datasets
-        train_Dataset, valid_Dataset, test_Dataset = data.create_datasets(seed, n_halos, batch_size, f_rockstar)
+        train_Dataset, valid_Dataset, test_Dataset = data.create_datasets(seed, batch_size, f_rockstar)
 
         #Create Dataloaders
         train_loader = DataLoader(dataset=train_Dataset, 
@@ -101,8 +100,8 @@ class objective(object):
 
 ##################################### INPUT #######################################
 # Data Parameters
-n_halos      = 3674
-n_properties = 11
+#n_halos      = 3674
+#n_properties = 11
 seed         = 4
 mass_per_particle = 6.56561e+11
 f_rockstar = "../Halo_Data/Rockstar_z=0.0.txt"
@@ -137,7 +136,7 @@ if __name__ == "__main__":
     
     # define the optuna study and optimize it
     objective = objective(input_size, bottleneck_neurons, n_min, n_max, min_layers,
-                 max_layers, f_rockstar, device, num_epochs, seed, batch_size, n_halos)
+                 max_layers, f_rockstar, device, num_epochs, seed, batch_size)
     
     # !! Optimization direction = minimize valid_loss !!
     study = optuna.create_study(study_name = study_name, direction="minimize") 
