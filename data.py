@@ -97,8 +97,12 @@ def read_data(f_rockstar):
 ###################################### Create Datasets ###################################
 class make_Dataset(Dataset):
     
-    def __init__(self, name, seed, n_halos, f_rockstar):
-         
+    def __init__(self, name, seed, f_rockstar):
+        
+        # Get the data
+        halo_data = read_data(f_rockstar)
+        n_halos = halo_data.shape[0] 
+        
         # shuffle the halo number (instead of 0 1 2 3...999 have a 
         # random permutation. E.g. 5 9 0 29...342)
         # n_halos = 495293
@@ -117,9 +121,6 @@ class make_Dataset(Dataset):
         self.size   = size
         self.input  = torch.zeros((size, 11), dtype=torch.float) # Each input has a shape of (11, 1) (flattened)
         
-        # Get the data
-        halo_data = read_data(f_rockstar)
-        
         # do a loop over all elements in the dataset
         for i in range(size):
             j = indexes[i+offset]          # find the halo index (shuffled)
@@ -133,10 +134,10 @@ class make_Dataset(Dataset):
 
     
 #This function creates datasets for train, valid, test
-def create_datasets(seed, n_halos, batch_size, f_rockstar):
+def create_datasets(seed, batch_size, f_rockstar):
     
-    train_Dataset = make_Dataset('train', seed, n_halos, f_rockstar)
-    valid_Dataset = make_Dataset('valid', seed, n_halos, f_rockstar)
-    test_Dataset  = make_Dataset('test',  seed, n_halos, f_rockstar)
+    train_Dataset = make_Dataset('train', seed, f_rockstar)
+    valid_Dataset = make_Dataset('valid', seed, f_rockstar)
+    test_Dataset  = make_Dataset('test',  seed, f_rockstar)
     
     return train_Dataset, valid_Dataset, test_Dataset
