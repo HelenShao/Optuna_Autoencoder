@@ -104,7 +104,7 @@ class objective(object):
 #n_properties = 11
 seed         = 4
 mass_per_particle = 6.56561e+11
-f_rockstar = "../Halo_Data/Rockstar_z=0.0.txt"
+f_rockstar = "../../Halo_Data/Rockstar_z=0.0.txt"
 
 # Training Parameters
 num_epochs    = 300
@@ -121,6 +121,7 @@ max_layers = 5          # Maximum number of hidden layers
 # Optuna Parameters
 n_trials   = 1000 
 study_name = 'Halos_AE_params'
+n_jobs     = 20
 
 ############################## Start OPTUNA Study ###############################
 
@@ -139,8 +140,10 @@ if __name__ == "__main__":
                  max_layers, f_rockstar, device, num_epochs, seed, batch_size)
     
     # !! Optimization direction = minimize valid_loss !!
-    study = optuna.create_study(study_name = study_name, direction="minimize") 
-    study.optimize(objective, n_trials=n_trials)
+    # Change initial sample of parameters to 100 
+    sampler = optuna.samplers.TPESampler(n_startup_trials=100) 
+    study = optuna.create_study(study_name=study_name, sampler=sampler,direction="minimize")
+    study.optimize(objective, n_trials=n_trials, n_jobs = n_jobs)
 
     pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
     complete_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
