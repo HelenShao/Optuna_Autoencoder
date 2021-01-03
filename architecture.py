@@ -45,9 +45,10 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min,
             # add the layers adjacent to the bottleneck
             encoder_layers.append(nn.Linear(in_features, bottleneck_neurons))
             encoder_layers.append(nn.LeakyReLU(0.2))
-        
-            decoder_layers.append(nn.Linear(bottleneck_neurons, in_features))
+            
             decoder_layers.append(nn.LeakyReLU(0.2))
+            decoder_layers.append(nn.Linear(bottleneck_neurons, in_features))
+            
         
         else:
             # Define out_features
@@ -61,9 +62,9 @@ def Autoencoder(trial, input_size, bottleneck_neurons, n_min,
             in_features = out_features[i] 
 
             # Add decoder layers
-            decoder_layers.append(nn.Linear(in_features, out_features[i-1]))
             decoder_layers.append(nn.LeakyReLU(0.2))
-
+            decoder_layers.append(nn.Linear(in_features, out_features[i-1]))
+            
     # Reverse order of layers in decoder list
     decoder_layers.reverse()
 
