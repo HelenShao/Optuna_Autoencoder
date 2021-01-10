@@ -142,7 +142,7 @@ if __name__ == "__main__":
     # !! Optimization direction = minimize valid_loss !!
     # Change initial sample of parameters to 100 
     sampler = optuna.samplers.TPESampler(n_startup_trials=100) 
-    study = optuna.create_study(study_name=study_name, sampler=sampler,direction="minimize")
+    study = optuna.create_study(study_name=study_name, sampler=sampler,direction="minimize", load_if_exists = True)
     study.optimize(objective, n_trials=n_trials, n_jobs = n_jobs)
 
     pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
