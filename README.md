@@ -1,5 +1,5 @@
-# Optuna_Autoencoder
-Using Optuna to optimize hyperparameters for autoencoder model in Pytorch
+# Optuna Autoencoder
+Using Optuna to optimize hyperparameters for autoencoder model implemented in Pytorch
 
 Goal of Project:
 To determine how to accruately represent dark matter halos with reduced number of properties using autoencoder and PCA
